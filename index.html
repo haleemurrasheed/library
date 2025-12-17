@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Digital Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>📚 My Library</h1>
+        <p>My books track</p>
+    </header>
+
+    <main>
+        <!-- Button to show the form -->
+        <button id="show-form-btn" class="btn">+ New Book</button>
+
+        <!-- Form for adding books (hidden by default) -->
+        <div id="book-form" class="form-container">
+            <h2>Add a New Book</h2>
+            <form id="add-book-form">
+                <div class="form-group">
+                    <label for="title">Book Title *</label>
+                    <input type="text" id="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author *</label>
+                    <input type="text" id="author" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pages">Number of Pages *</label>
+                    <input type="number" id="pages" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="read-status">
+                        <input type="checkbox" id="read-status">
+                        I have read this book
+                    </label>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn">Add to Library</button>
+                    <button type="button" id="cancel-btn" class="btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Container where books will be displayed -->
+        <div id="library-container">
+            <p id="empty-message">Your library is empty. Add a book!</p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
