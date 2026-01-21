@@ -23,16 +23,19 @@
                 <div class="form-group">
                     <label for="title">Book Title *</label>
                     <input type="text" id="title" required>
+                    <div class="error-message" id="title-error"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="author">Author *</label>
                     <input type="text" id="author" required>
+                    <div class="error-message" id="author-error"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="pages">Number of Pages *</label>
                     <input type="number" id="pages" min="1" required>
+                    <div class="error-message" id="pages-error"></div>
                 </div>
 
                 <div class="form-group">
@@ -56,6 +59,5 @@
     </main>
 
     <script src="script.js"></script>
-
 </body>
 </html>

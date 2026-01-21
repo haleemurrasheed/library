@@ -11,6 +11,58 @@ Book.prototype.toggleRead = function() {
     this.read = !this.read;
 };
 
+// ========== FORM VALIDATION FUNCTIONS ==========
+function showError(inputId, message) {
+    const errorElement = document.getElementById(`${inputId}-error`);
+    const inputElement = document.getElementById(inputId);
+
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    inputElement.classList.add('error');
+}
+
+function clearError(inputId) {
+    const errorElement = document.getElementById(`${inputId}-error`);
+    const inputElement = document.getElementById(inputId);
+
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
+    inputElement.classList.remove('error');
+}
+
+function validateField(inputId, fieldName) {
+    const inputElement = document.getElementById(inputId);
+    const value = inputElement.value.trim();
+
+    if (!value) {
+        showError(inputId, `${fieldName} must be filled!`);
+        return false;
+    }
+
+    // Special validation for pages
+    if (inputId === 'pages') {
+        const pagesValue = parseInt(value);
+        if (isNaN(pagesValue) || pagesValue <= 0) {
+            showError(inputId, 'Please enter a valid number of pages (minimum 1)');
+            return false;
+        }
+    }
+
+    clearError(inputId);
+    return true;
+}
+
+function validateForm() {
+    let isValid = true;
+
+    // Validate each required field
+    if (!validateField('title', 'Book title')) isValid = false;
+    if (!validateField('author', 'Author name')) isValid = false;
+    if (!validateField('pages', 'Number of pages')) isValid = false;
+
+    return isValid;
+}
+
 // ========== WAIT FOR PAGE TO LOAD ==========
 document.addEventListener('DOMContentLoaded', function() {
     // ========== ELEMENT REFERENCES ==========
@@ -20,6 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const addBookForm = document.getElementById('add-book-form');
     const showFormBtn = document.getElementById('show-form-btn');
     const cancelBtn = document.getElementById('cancel-btn');
+
+    // Form input elements
+    const titleInput = document.getElementById('title');
+    const authorInput = document.getElementById('author');
+    const pagesInput = document.getElementById('pages');
 
     // ========== LIBRARY DATA ==========
     const myLibrary = [];
@@ -65,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p><strong>Author:</strong> ${book.author}</p>
                 <p><strong>Pages:</strong> ${book.pages}</p>
                 <div class="status">${book.read ? 'Read' : 'Not Read'}</div>
-   
+
                 <div class="book-actions">
                     <button class="toggle-read-btn" title="${book.read ? 'Mark Unread' : 'Mark Read'}">
                         ${book.read ? '👁️‍🗨️' : '👁️'}
@@ -74,8 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         🗑️
                     </button>
                 </div>
-            `;    
-
+            `;
 
             container.appendChild(bookCard);
         });
@@ -85,32 +141,67 @@ document.addEventListener('DOMContentLoaded', function() {
     showFormBtn.addEventListener('click', function() {
         bookForm.style.display = 'block';
         showFormBtn.style.display = 'none';
+        // Clear any existing errors when showing form
+        clearError('title');
+        clearError('author');
+        clearError('pages');
     });
 
     cancelBtn.addEventListener('click', function() {
         bookForm.style.display = 'none';
         showFormBtn.style.display = 'block';
         addBookForm.reset();
+        // Clear errors when cancelling
+        clearError('title');
+        clearError('author');
+        clearError('pages');
+    });
+
+    // Real-time validation as user types
+    titleInput.addEventListener('input', function() {
+        validateField('title', 'Book title');
+    });
+
+    authorInput.addEventListener('input', function() {
+        validateField('author', 'Author name');
+    });
+
+    pagesInput.addEventListener('input', function() {
+        validateField('pages', 'Number of pages');
     });
 
     addBookForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const title = document.getElementById('title').value.trim();
-        const author = document.getElementById('author').value.trim();
-        const pages = parseInt(document.getElementById('pages').value);
-        const read = document.getElementById('read-status').checked;
-
-        if (!title || !author || !pages || pages <= 0) {
-            alert('Please fill in all fields correctly!');
+        // Validate form
+        if (!validateForm()) {
+            // Focus on first invalid field
+            if (!titleInput.value.trim()) {
+                titleInput.focus();
+            } else if (!authorInput.value.trim()) {
+                authorInput.focus();
+            } else if (!pagesInput.value.trim() || parseInt(pagesInput.value) <= 0) {
+                pagesInput.focus();
+            }
             return;
         }
 
+        const title = titleInput.value.trim();
+        const author = authorInput.value.trim();
+        const pages = parseInt(pagesInput.value);
+        const read = document.getElementById('read-status').checked;
+
         addBookToLibrary(title, author, pages, read);
 
+        // Reset form and hide it
         addBookForm.reset();
         bookForm.style.display = 'none';
         showFormBtn.style.display = 'block';
+
+        // Clear any error messages
+        clearError('title');
+        clearError('author');
+        clearError('pages');
     });
 
     // ========== EVENT DELEGATION ==========
@@ -133,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    
     // ========== INITIALIZE ==========
     // Add sample books
     addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', 295, true);
